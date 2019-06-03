@@ -1,5 +1,7 @@
-from client import Client
+from model.client import Client
 from socket import AF_INET, socket, SOCK_STREAM
+
+
 IP = '127.0.0.1'
 PORT = 12345
 
