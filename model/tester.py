@@ -6,10 +6,11 @@ class Tester():
         self.port = port
         self.dirResult = './result/' # Diretorio do arquivo de saida
         self.nameResult = 'result.txt' # Nome do arquivo de saida que contem os resultados do teste de velocidade
-        
+        self.userTcp = None
+        self.userUdp = None
 
 
-        
+
     # Abre uma conexao tcp e aguarda um cliente, caso nao receba uma conexao em 10 segundos
     def startTcpTest(self):
         sock = socket(AF_INET, SOCK_STREAM)
