@@ -1,5 +1,9 @@
 from socket import AF_INET, socket, SOCK_STREAM
 from model.client import Client
+
+
+
+
 class Tester():
     def __init__(self, port):
         self.ip = ''
@@ -19,11 +23,11 @@ class Tester():
         sock.listen(1) # Seta o numero de conexoes a ser esperada
         client, client_address = sock.accept()
         self.userTcp = Client(client_address[0], client_address[1])
-        # print("%s:%s conectado." %  client_address)
-        # print(client_address)
 
-        # client.send()
+        print("%s:%s conectado." %  client_address)
 
+
+        sock.close()
 
 
 
