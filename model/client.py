@@ -10,11 +10,11 @@ class Client():
 
     # Seta a velocidade de Download do cliente em Mbits/s
     def setDownRate(self, vel):
-        self.vel = vel
+        self.velDown = round(vel, 2)
         
     # Seta a velocidade de Upload do cliente em Mbits/s
     def setUpRate(self, vel):
-        self.vel = vel
+        self.velUp = round(vel, 2)
     
     # Seta a latencia/ping do cliente em ms
     def setLat(self, lat):

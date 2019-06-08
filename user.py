@@ -1,4 +1,5 @@
 from model.client import Client
+from model.connectionConfig import Config
 from socket import AF_INET, socket, SOCK_STREAM
 import sys
 
@@ -17,7 +18,7 @@ def parameters(param):
 
 
 
-
+config = Config() # Importando configuracoes globais de pacotes
 
 param = sys.argv[1:]
 ip, port = parameters(param)
@@ -27,11 +28,22 @@ cli = Client(ip, port)
 
 print("Iniciando testador de conexao...")
 
+print("Iniciando teste de conexao via TCP/IP")
 sock = socket(AF_INET, SOCK_STREAM)
 sock.connect((cli.ip, cli.port))
 print("Conectado ao servidor de teste")
 
+data = b'0' * config.bufferTcp
+# Enviando pacotes necessarios para geracao das estatisticas
+for i in range(config.numberPacketsTcp):
+    sock.send(data)
+# Recebendo pacotes necessarios para geracao das estatisticas
+for i in range(config.numberPacketsTcp):
+    sock.recv(config.bufferTcp)
 
-print("Iniciando teste de conexao via TCP/IP")
+# Pacote de calculo de latencia
+sock.recv(config.bufferTcp)
+sock.send(data)
+
 
 sock.close()
