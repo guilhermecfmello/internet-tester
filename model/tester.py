@@ -1,7 +1,8 @@
-from socket import AF_INET, socket, SOCK_STREAM
+from socket import AF_INET, socket, SOCK_STREAM, SOCK_DGRAM
 from model.client import Client
 from model.connectionConfig import Config
 import time
+import json
 
 
 
@@ -21,7 +22,7 @@ class Tester():
         config = Config() #importando configuracoes globais
         sock = socket(AF_INET, SOCK_STREAM)
         sock.bind((self.ip, self.port)) # Abre a conexao via socket
-        sock.settimeout(10) 
+        # sock.settimeout(10) 
         sock.listen(1) # Seta o numero de conexoes a ser esperada
         client, client_address = sock.accept()
         self.userTcp = Client(client_address[0], client_address[1]) # Criando classe para armazenar os resultados
@@ -67,6 +68,8 @@ class Tester():
         print("Velocidade de Download do cliente: " + str(self.userTcp.velDown) + " Mbits")
         print("Velocidade de Upload do cliente: " + str(self.userTcp.velUp) + " Mbits")
         print("Latencia do Cliente: " + str(self.userTcp.lat) + " ms")
+
+        print("Fechando socketTCP")
         sock.close()
 
 
@@ -75,13 +78,88 @@ class Tester():
     # Abre uma conexao udp e aguarda um cliente, 
     def startUdpTest(self):
         print("Iniciando teste em UDP")
+        config = Config() #Importando configuracoes globais de pacotes
+        self.userUdp = Client()
+        s = socket(AF_INET, SOCK_DGRAM)
+        s.bind((self.ip, self.port))
+
+        
+        print("Iniciando teste UDP Upload...")
+        startTime = time.time()
+        data, addr = s.recvfrom(config.bufferUdp)
+
+        for i in range(config.numberPacketsUdp - 1):
+            s.recv(config.bufferUdp)
+            # Tratar protocolo UDP aqui
+        print("Fim teste UDP Upload")
+        endTime = time.time()
+        totalTime = endTime - startTime
+
+        velUp = ((config.bufferUdp * config.numberPacketsUdp)/8000000) / totalTime
+
+        self.userUdp.setUpRate(velUp)
+
+        print("Iniciando teste UDP Download")
+        data = b'0'* config.bufferUdp # Pacote de bytes 0.
+
+        startTime = time.time()
+        for i in range(config.numberPacketsUdp):
+            s.sendto(data,addr)
+            #Tratar protocolo UDP aqui
+
+        endTime = time.time()
+
+        timeTotal = endTime - startTime
+
+        velDown = ((config.bufferUdp * config.numberPacketsUdp) * 8000000) / timeTotal
+
+        self.userUdp.setDownRate(velDown)
+
+
+        #Pegando latencia do cliente
+        print("Inicio teste UDP Latencia")
+        startTime = time.time()
+        s.sendto(data, addr)
+        s.recv(config.bufferUdp)
+        endTime = time.time()
+
+        self.userUdp.setLat((endTime - startTime)*1000)
+        print("Fim dos testes UDP")
+
+        print("Velocidade de Download do cliente: " + str(self.userUdp.velDown) + " Mbits")
+        print("Velocidade de Upload do cliente: " + str(self.userUdp.velUp) + " Mbits")
+        print("Latencia do Cliente: " + str(self.userUdp.lat) + " ms")
+
+        # Maciota pra imprimir o resultado do cliente no mesmo arquivo que o tcp
+        self.userUdp.setIp(self.userTcp.ip)
+        self.userUdp.setPort(self.userTcp.port)
+        s.close()
 
 
 
 
 
+    def exportResultsJSON(self):
+        resultTcp = {
+            "Protocolo": "TCP/IP",
+            "IP": self.userTcp.ip,
+            "Port": self.userTcp.port,
+            "Download": str(self.userTcp.velDown) + " Mbits/s",
+            "Upload": str(self.userTcp.velUp) + " Mbits/s",
+            "Latency": str(self.userTcp.lat) + "ms",
+        }
 
-    def exportResults(self):
-        print("Resultados")
-        # Implementar impressao de resultados em arquivo,
-        # preferencialmente em csv
+        resultUdp = {
+            "Protocolo": "UDP",
+            "IP": self.userUdp.ip,
+            "Port": self.userUdp.port,
+            "Download": str(self.userUdp.velDown) + " Mbits/s",
+            "Upload": str(self.userUdp.velUp) + " Mbits/s",
+            "Latency": str(self.userUdp.lat) + "ms",
+        }
+
+        file = open("results/" + self.userUdp.ip + ".json", "w")
+        file.write(json.dumps(resultTcp))
+        file.write(json.dumps(resultUdp))
+        file.close()
+        

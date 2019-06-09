@@ -3,7 +3,10 @@
 class Client():
 
 
-    def __init__(self, ip, port):
+    # def __init__(self):
+    #     pass
+
+    def __init__(self, ip="", port=""):
         self.port = port
         self.ip = ip
 
@@ -20,4 +23,9 @@ class Client():
     def setLat(self, lat):
         self.lat = lat
 
+    def setIp(self, ip):
+        self.ip = ip
+
+    def setPort(self, port):
+        self.port = port
     

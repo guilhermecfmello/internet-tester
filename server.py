@@ -24,21 +24,18 @@ port = parameters(param)
 print("port: " + str(port))
 
 
-#Tratamento de parametros
 
 
-# Descomentar para alterar a porta padrao
-# def readClient():
-    # port = input("Digite a porta da conexao: ")
-    # port = PORT
-    # return port
-
-# Cria uma Instancia de testador na porta especifica
-# port = readClient()
 test = Tester(port)
 
+# Teste de conexao via socket TCP
 test.startTcpTest()
 
+# Teste de conexao via socket UDP
+test.startUdpTest()
+
+# Exportacao dos resultados
+test.exportResultsJSON()
 
 
 
