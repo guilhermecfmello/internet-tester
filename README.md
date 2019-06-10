@@ -16,7 +16,7 @@ Arquivos:<br/>
 1. Arquivos na pasta Model estão os modelos de classes e o executor do teste.<br/>
 2. O Arquivo tester.py possui uma classe Tester, nela é implementada o teste em si<br/>
 3. Os metodos de tester.py devem:<br/>
-    -Abrir e fechar todas as conexoes abertas<br/>
-    -Instanciar um cliente e seta-lo com os resultados (Client)<br/>
-    -Salvar a instancia do cliente no atributo userTcp ou userUdp<br/>
-    -Esses clientes setados serao utilizados para gerar o relatorio de saida<br/>
+    - Abrir e fechar todas as conexoes abertas<br/>
+    - Instanciar um cliente e seta-lo com os resultados (Client)<br/>
+    - Salvar a instancia do cliente no atributo userTcp ou userUdp<br/>
+    - Esses clientes setados serao utilizados para gerar o relatorio de saida<br/>
