@@ -5,6 +5,7 @@ NUM_PACKETS_TCP = 2000# Numeros de pacotes que serao enviados no protocolo tcp
 
 BUFFERR_UDP = 1000 # pacotes de 1000 bytes para udp
 NUM_PACKETS_UDP = 1000 # Numeros de pacotes que serao enviados no protocolo udp
+
 class Config():
     def __init__(self):
         self.bufferTcp = BUFFER_TCP

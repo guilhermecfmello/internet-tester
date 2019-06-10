@@ -21,7 +21,7 @@ class Client():
     
     # Seta a latencia/ping do cliente em ms
     def setLat(self, lat):
-        self.lat = lat
+        self.lat = round(lat, 2)
 
     def setIp(self, ip):
         self.ip = ip

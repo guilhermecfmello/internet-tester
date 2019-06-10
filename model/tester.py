@@ -19,33 +19,32 @@ class Tester():
 
     # Abre uma conexao tcp e aguarda um cliente, caso nao receba uma conexao em 10 segundos
     def startTcpTest(self):
-        config = Config() #importando configuracoes globais
+        config = Config()   #importando configuracoes globais
         sock = socket(AF_INET, SOCK_STREAM)
         sock.bind((self.ip, self.port)) # Abre a conexao via socket
-        # sock.settimeout(10) 
         sock.listen(1) # Seta o numero de conexoes a ser esperada
         client, client_address = sock.accept()
         self.userTcp = Client(client_address[0], client_address[1]) # Criando classe para armazenar os resultados
         print("%s:%s conectado." %  client_address)
 
         # Teste de upload da internet do usuario
-        print("Iniciando teste recebimento FTP")
-        startTime = time.time()
+        print("Iniciando teste recebimento TCP")
+        startTime = time.time() 
         for i in range(config.numberPacketsTcp):
             client.recv(config.bufferTcp)
         endTime = time.time()
-        totalTime = endTime - startTime
+        totalTime = endTime - startTime # Calculo do tempo total de transferencia
     
 
-        velUp = ((config.bufferTcp * config.numberPacketsTcp)/8000000)/ totalTime #Calculando velocidade de upload
+        velUp = ((config.bufferTcp * config.numberPacketsTcp)/8000000)/ totalTime   #Calculando velocidade de upload
 
-        self.userTcp.setUpRate(velUp)
+        self.userTcp.setUpRate(velUp) # Seta a velocidade de upload calculada
 
         # Inicio teste de Download do usuario
-        print("Iniciando teste de envio FTP")
+        print("Iniciando teste de envio TCP")
 
+        data = b'0' * config.bufferTcp # Montagem do pacote de dados a ser enviado (Vetor de bytes 0)
         startTime = time.time()
-        data = b'0'*config.bufferTcp            
         for i in range(config.numberPacketsTcp):
             client.send(data)
         endTime = time.time()
@@ -85,33 +84,37 @@ class Tester():
 
         
         print("Iniciando teste UDP Upload...")
-        startTime = time.time()
-        data, addr = s.recvfrom(config.bufferUdp)
 
-        for i in range(config.numberPacketsUdp - 1):
+        startTime = time.time()
+        data, addr = s.recvfrom(config.bufferUdp) # Recebe o primeiro pacote com o metodo "recvfrom" para pegar o IP do cliente e armazenar na variavel "addr"
+        for i in range(config.numberPacketsUdp - 1): # Depois de pegar o IP, recebe os pacotes com o metodo padrao "recv"
             s.recv(config.bufferUdp)
             # Tratar protocolo UDP aqui
+
         print("Fim teste UDP Upload")
-        endTime = time.time()
-        totalTime = endTime - startTime
+        tempoPerdidoNaEsperaDoPacote = config.numberPacketsUdp/10*0.01
+        endTime = time.time() 
+        totalTime = endTime - startTime - tempoPerdidoNaEsperaDoPacote
 
-        velUp = ((config.bufferUdp * config.numberPacketsUdp)/8000000) / totalTime
+        velUp = ((config.bufferUdp * config.numberPacketsUdp)/8000000) / totalTime # Calculo da velocidade de upload
 
-        self.userUdp.setUpRate(velUp)
+        self.userUdp.setUpRate(velUp) #Setando velocidade de upload do cliente
 
         print("Iniciando teste UDP Download")
-        data = b'0'* config.bufferUdp # Pacote de bytes 0.
+        data = b'0'* config.bufferUdp # Pacote de bytes 0 para enviar
 
         startTime = time.time()
         for i in range(config.numberPacketsUdp):
             s.sendto(data,addr)
+            if i % 10 == 0:
+                time.sleep(0.01)
             #Tratar protocolo UDP aqui
 
         endTime = time.time()
 
-        timeTotal = endTime - startTime
+        timeTotal = endTime - startTime - tempoPerdidoNaEsperaDoPacote
 
-        velDown = ((config.bufferUdp * config.numberPacketsUdp) * 8000000) / timeTotal
+        velDown = ((config.bufferUdp * config.numberPacketsUdp) / 8000000) / timeTotal
 
         self.userUdp.setDownRate(velDown)
 
@@ -126,13 +129,10 @@ class Tester():
         self.userUdp.setLat((endTime - startTime)*1000)
         print("Fim dos testes UDP")
 
-        print("Velocidade de Download do cliente: " + str(self.userUdp.velDown) + " Mbits")
-        print("Velocidade de Upload do cliente: " + str(self.userUdp.velUp) + " Mbits")
-        print("Latencia do Cliente: " + str(self.userUdp.lat) + " ms")
-
         # Maciota pra imprimir o resultado do cliente no mesmo arquivo que o tcp
         self.userUdp.setIp(self.userTcp.ip)
         self.userUdp.setPort(self.userTcp.port)
+
         s.close()
 
 
@@ -158,8 +158,11 @@ class Tester():
             "Latency": str(self.userUdp.lat) + "ms",
         }
 
-        file = open("results/" + self.userUdp.ip + ".json", "w")
+        file = open(self.userUdp.ip + ".json", "w")
+        file.write("[")
         file.write(json.dumps(resultTcp))
+        file.write(",")
         file.write(json.dumps(resultUdp))
+        file.write("]")
         file.close()
         
