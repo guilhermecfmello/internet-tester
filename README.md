@@ -2,7 +2,7 @@
 Testador de velocidade de conexão implementado utilizando a linguagem python em sua versão 3.
 
 Instrução de Execução:
-    1- python3 server.py -p 12345
+    1- python3 server.py -p 12345\n
         - Para executar o servidor
         - O parametro -p indica a porta de conexao
         - Caso nao seja fornecido o -p, o padrao é setado o padrão 12345
