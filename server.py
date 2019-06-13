@@ -1,8 +1,9 @@
 import sys
 from model.tester import Tester
 
+
 def parameters(param):
-    
+
     if len(param) > 1:
         cond = False
         for p in param:
@@ -13,17 +14,17 @@ def parameters(param):
                     return int(p)
 
                 else:
-                    print("Erro na passagem de parametros, use: python3 server.py -p (port)")
+                    print(
+                        "Erro na passagem de parametros, use: python3 server.py -p (port)")
                     sys.exit()
     else:
         return 12345
+
 
 # Pega parametros
 param = sys.argv[1:]
 port = parameters(param)
 print("port: " + str(port))
-
-
 
 
 test = Tester(port)
@@ -36,6 +37,3 @@ test.startUdpTest()
 
 # Exportacao dos resultados
 test.exportResultsJSON()
-
-
-
