@@ -31,21 +31,27 @@ def testTcp(cli):
     data = b'0' * config.bufferTcp
     print("Teste Upload iniciado...")
     # Enviando pacotes necessarios para geracao das estatisticas
-    for i in range(config.numberPacketsTcp):
+    startTime = time.time()
+    while time.time() - startTime < config.testTime:
         sock.send(data)
     print("Fim teste Upload")
     # Recebendo pacotes necessarios para geracao das estatisticas
 
+    sock.recv(config.bufferTcp)
     print("Teste Download iniciado...")
-    for i in range(config.numberPacketsTcp):
+    startTime = time.time()
+    while time.time() - startTime < config.testTime + 0.1:
         sock.recv(config.bufferTcp)
     print("Fim teste Download")
 
+    time.sleep(1)
     # Pacote de calculo de latencia
-    # print("Teste Latencia iniciado...")
-    # sock.recv(config.bufferTcp)
-    # sock.send(data)
-    # print("Fim teste latencia")
+    print("Teste Latencia iniciado...")
+    sock.send(data)
+    sock.recv(config.bufferTcp)
+    # time.sleep(0.1)
+    sock.send(data)
+    print("Fim teste latencia")
 
     sock.close()
 
@@ -82,9 +88,10 @@ def testUdp(cli):
                 if(response.find('erro') == 0 and response.find('confirmado') < 0):
                     i = i - j - 1
                     j = -1
-                    print("Erro na transmissao, tentando enviar novamente")
+                    # print("Erro na transmissao, tentando enviar novamente")
                 elif(response.find('confirmado') == 0):
-                    print("Confirmacao recebida, continuando transmissao")
+                    pass
+                    # print("Confirmacao recebida, continuando transmissao")
                 response = '/0'
             except TimeoutError:
                 print("Timeout Error")
@@ -112,9 +119,11 @@ def testUdp(cli):
         npackage = struct.unpack((">I").encode(), bytearray(b))[0]
 
         if(npackage == i and len(data) == config.bufferUdp):
-            print("Recebido pacote: "+str(npackage))
+            pass
+            # print("Recebido pacote: "+str(npackage))
         elif(len(data != config.bufferUdp and npackage == config.numberPacketsUdp)):
-            print("Recebido ultimo pacote: "+str(npackage))
+            pass
+            # print("Recebido ultimo pacote: "+str(npackage))
         else:
             i = aux_i
             j = -1
@@ -124,7 +133,7 @@ def testUdp(cli):
             j = -1
             aux_i = i
             sock.sendto(('confirmado').encode(), addr)
-            print(">>> janela de 10 pacotes recebidos com sucesso!")
+            # print(">>> janela de 10 pacotes recebidos com sucesso!")
 
         # Tratar protocolo UDP aqui
 
@@ -148,6 +157,6 @@ print("IP: " + ip + "Port: " + str(port))
 
 print("Iniciando testador de velocidade de conexao")
 testTcp(cli)
-time.sleep(1)
+time.sleep(2)
 testUdp(cli)
 print("Encerrando Internet-tester")

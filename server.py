@@ -1,7 +1,6 @@
 import sys
 from model.tester import Tester
 
-
 def parameters(param):
 
     if len(param) > 1:

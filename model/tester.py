@@ -30,41 +30,48 @@ class Tester():
 
         # Teste de upload da internet do usuario
         print("Iniciando teste recebimento TCP")
+        # sock.settimeout(5)
+        numberPacketsTcp = 0
         startTime = time.time()
-        for i in range(config.numberPacketsTcp):
+        while time.time() - startTime < config.testTime + 0.1:
             client.recv(config.bufferTcp)
-        endTime = time.time()
-        totalTime = endTime - startTime  # Calculo do tempo total de transferencia
-
-        velUp = ((config.bufferTcp * config.numberPacketsTcp) /
-                 8000000) / totalTime  # Calculando velocidade de upload
+            numberPacketsTcp = numberPacketsTcp + 1
+        
+        velUp = ((config.bufferTcp * numberPacketsTcp) /
+                 8000000) / config.testTime # Calculando velocidade de upload
 
         self.userTcp.setUpRate(velUp)  # Seta a velocidade de upload calculada
 
+        time.sleep(1) # Aguardando uma janela de tempo para o usuario receber os pacotes
         # Inicio teste de Download do usuario
-        print("Iniciando teste de envio TCP")
 
-        # Montagem do pacote de dados a ser enviado (Vetor de bytes 0)
-        data = b'0' * config.bufferTcp
+
+        
+        numberPacketsTcp = 0
+        data = b'0' * config.bufferTcp # Montagem do pacote de dados a ser enviado (Vetor de bytes 0)
+        client.send(data) # Pacote para sincronizar
+        print("Iniciando teste de envio TCP")
         startTime = time.time()
-        for i in range(config.numberPacketsTcp):
+        while time.time() - startTime < config.testTime:
             client.send(data)
-        endTime = time.time()
-        totalTime = endTime - startTime
+            numberPacketsTcp = numberPacketsTcp + 1
 
         # Calculando velocidade de download do usuario
-        velDown = ((config.bufferTcp * config.numberPacketsTcp) /
-                   8000000)/totalTime
+        velDown = ((config.bufferTcp * numberPacketsTcp) /
+                   8000000)/config.testTime
 
         self.userTcp.setDownRate(velDown)
 
+        # time.sleep(1) # Aguardando uma janela de tempo para o usuario receber os pacotes
         # Pegando Latencia do cliente
-        # startTime = time.time()
-        # client.send(data)
-        # client.recv(config.bufferTcp)
-        # endTime = time.time()
+        startTime = time.time()
+        client.recv(config.bufferTcp)
+        # time.sleep(0.1)
+        client.send(data)
+        client.recv(config.bufferTcp)
+        endTime = time.time()
 
-        self.userTcp.setLat((endTime-startTime)*1000)
+        self.userTcp.setLat((endTime-startTime-0.1)*1000)
         print("Fim dos testes TCP")
 
         print("Velocidade de Download do cliente: " +
@@ -102,10 +109,12 @@ class Tester():
 
             # Verifica se é o pacote que deve ser recebido
             if(npackage == i and len(data) == config.bufferUdp):
-                print("Recebido pacote: "+str(npackage))
+                pass
+            # print("Recebido pacote: "+str(npackage))
             # Verifica se é o último pacote
             elif(len(data) != config.bufferUdp and npackage == config.numberPacketsUdp):
-                print("Recebido ultimo pacote: "+str(npackage))
+                pass
+            # print("Recebido ultimo pacote: "+str(npackage))
             # Erro na transmissao do pacote
             else:
                 i = aux_i
@@ -116,7 +125,7 @@ class Tester():
                 j = -1
                 aux_i = i
                 s.sendto(("confirmado").encode(), addr)
-                print(">>> Janela de 10 pacotes recebidos com sucesso!")
+                # print(">>> Janela de 10 pacotes recebidos com sucesso!")
             # Tratar protocolo UDP aqui
 
             i = i + 1
@@ -158,7 +167,8 @@ class Tester():
                         j = -1
                         print("Erro na transmissao, tentando enviar novamente")
                     elif(response.find('confirmado') == 0):
-                        print("Confirmacao recebida, continuando transmissao")
+                        pass
+                        # print("Confirmacao recebida, continuando transmissao")
                     response = '/0'
                 except TimeoutError:
                     print("Timeout Error")
