@@ -42,10 +42,10 @@ def testTcp(cli):
     print("Fim teste Download")
 
     # Pacote de calculo de latencia
-    print("Teste Latencia iniciado...")
-    sock.recv(config.bufferTcp)
-    sock.send(data)
-    print("Fim teste latencia")
+    # print("Teste Latencia iniciado...")
+    # sock.recv(config.bufferTcp)
+    # sock.send(data)
+    # print("Fim teste latencia")
 
     sock.close()
 

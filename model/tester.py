@@ -59,10 +59,10 @@ class Tester():
         self.userTcp.setDownRate(velDown)
 
         # Pegando Latencia do cliente
-        startTime = time.time()
-        client.send(data)
-        client.recv(config.bufferTcp)
-        endTime = time.time()
+        # startTime = time.time()
+        # client.send(data)
+        # client.recv(config.bufferTcp)
+        # endTime = time.time()
 
         self.userTcp.setLat((endTime-startTime)*1000)
         print("Fim dos testes TCP")
