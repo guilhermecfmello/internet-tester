@@ -29,25 +29,32 @@ def testTcp(cli):
     sock.connect((cli.ip, cli.port))
 
     data = b'0' * config.bufferTcp
+    finalData = b'1' * config.bufferTcp
+
+
+    
     print("Teste Upload iniciado...")
     # Enviando pacotes necessarios para geracao das estatisticas
     startTime = time.time()
     while time.time() - startTime < config.testTime:
         sock.send(data)
+    sock.send(finalData)
+    
     print("Fim teste Upload")
     # Recebendo pacotes necessarios para geracao das estatisticas
 
-    sock.recv(config.bufferTcp)
+
+
+
     print("Teste Download iniciado...")
     startTime = time.time()
-    while time.time() - startTime < config.testTime + 0.1:
-        sock.recv(config.bufferTcp)
+    dataRecv = sock.recv(config.bufferTcp)
+    while dataRecv != finalData:
+        dataRecv = sock.recv(config.bufferTcp)
     print("Fim teste Download")
 
-    time.sleep(1)
     # Pacote de calculo de latencia
     print("Teste Latencia iniciado...")
-    sock.send(data)
     sock.recv(config.bufferTcp)
     # time.sleep(0.1)
     sock.send(data)
@@ -63,6 +70,7 @@ def testUdp(cli):
 
     # buffer - 4 para ter espaço para o número do pacote
     data = b'0' * (config.bufferUdp - 4)
+    finalData = b'1' * config.bufferUdp
 
     sock = socket(AF_INET, SOCK_DGRAM)
     sock.connect((cli.ip, cli.port))
@@ -75,7 +83,8 @@ def testUdp(cli):
     #print("Enviou pacote UDP: " + str(0) + "->" + str(package))
     i = 1
     j = 0
-    while(i in range(config.numberPacketsUdp+1)):
+    startTime = time.time()
+    while time.time() - startTime < config.testTime:
         npackage = i.to_bytes(4, 'big')
         package = npackage + data
         sock.sendto(package, (cli.ip, cli.port))
@@ -104,6 +113,20 @@ def testUdp(cli):
 
         i = i + 1
         j = j + 1
+
+    sock.send(finalData)
+    try:
+        response = sock.recv(config.bufferUdp)
+        if(response != finalData):
+            print("Erro na confirmacao")
+        else:
+            print("Confirmado")
+    except TimeoutError:
+        print("Timeout Error")
+    except:
+        print("Erro desconhecido")
+
+        
     print("Fim teste Upload")
 
     print("Teste Download iniciado...")
@@ -112,8 +135,11 @@ def testUdp(cli):
     i = 1
     j = 0
     aux_i = 0
-    while(i in range(config.numberPacketsUdp+1)):
+    startTime = time.time()
+    while True:
         data = sock.recv(config.bufferUdp)
+        if data == finalData:
+            break
         b = data[0:4]
 
         npackage = struct.unpack((">I").encode(), bytearray(b))[0]
@@ -121,9 +147,6 @@ def testUdp(cli):
         if(npackage == i and len(data) == config.bufferUdp):
             pass
             # print("Recebido pacote: "+str(npackage))
-        elif(len(data != config.bufferUdp and npackage == config.numberPacketsUdp)):
-            pass
-            # print("Recebido ultimo pacote: "+str(npackage))
         else:
             i = aux_i
             j = -1
@@ -132,6 +155,7 @@ def testUdp(cli):
         if(i % 10 == 0):
             j = -1
             aux_i = i
+            time.sleep(0.02)
             sock.sendto(('confirmado').encode(), addr)
             # print(">>> janela de 10 pacotes recebidos com sucesso!")
 
@@ -141,9 +165,12 @@ def testUdp(cli):
         j = j + 1
     print("Fim teste Download")
 
+
+
     # Teste latencia
     print("Teste Latencia iniciado...")
-    sock.recv(config.bufferUdp)
+    while sock.recv(config.bufferUdp) != finalData:
+        pass
     sock.send(data)
     print("Fim teste latencia")
     sock.close()
@@ -152,11 +179,11 @@ def testUdp(cli):
 param = sys.argv[1:]
 ip, port = parameters(param)
 cli = Client(ip, port)
-print("IP: " + ip + "Port: " + str(port))
+print("IP: " + ip + " Port: " + str(port))
 
 
-print("Iniciando testador de velocidade de conexao")
+print("\nIniciando testador de velocidade de conexao\n\n\n")
 testTcp(cli)
-time.sleep(2)
+time.sleep(1)
 testUdp(cli)
 print("Encerrando Internet-tester")
