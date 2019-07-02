@@ -1,1 +1,1 @@
-[{"Protocolo": "TCP/IP", "IP": "127.0.0.1", "Port": 41538, "Download": "51.21 Mbits/s", "Upload": "54.0 Mbits/s", "Latency": "0.15ms"},{"Protocolo": "UDP", "IP": "127.0.0.1", "Port": 41538, "Download": "0.06 Mbits/s", "Upload": "0.06 Mbits/s", "Latency": "0.2ms"}]
+[{"Protocolo": "TCP/IP", "IP": "127.0.0.1", "Port": 50888, "Download": "55.75 Mbits/s", "Upload": "53.0 Mbits/s", "Latency": "0.24ms"},{"Protocolo": "UDP", "IP": "127.0.0.1", "Port": 50888, "Download": "0.06 Mbits/s", "Upload": "0.06 Mbits/s", "Latency": "0.33ms"}]

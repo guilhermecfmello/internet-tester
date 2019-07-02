@@ -56,9 +56,10 @@ class Tester():
         numberPacketsTcp = 0
         print("Iniciando teste de envio TCP")
         startTime = time.time()
-        while time.time() - startTime < config.testTime:
+        while (time.time() - startTime) < config.testTime:
             client.send(data)
             numberPacketsTcp = numberPacketsTcp + 1
+        time.sleep(0.1)
         client.send(finalData)
         # Calculando velocidade de download do usuario
         velDown = ((config.bufferTcp * numberPacketsTcp) /

@@ -38,6 +38,8 @@ def testTcp(cli):
     startTime = time.time()
     while time.time() - startTime < config.testTime:
         sock.send(data)
+    
+    time.sleep(0.1)
     sock.send(finalData)
     
     print("Fim teste Upload")
