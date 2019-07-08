@@ -51,8 +51,11 @@ def testTcp(cli):
     print("Teste Download iniciado...")
     startTime = time.time()
     dataRecv = sock.recv(config.bufferTcp)
-    while dataRecv != finalData:
+    while True:
         dataRecv = sock.recv(config.bufferTcp)
+        if dataRecv.decode()[0] == str(1) and dataRecv.decode()[size - 1] == str(1):
+            break
+    
     print("Fim teste Download")
 
     # Pacote de calculo de latencia

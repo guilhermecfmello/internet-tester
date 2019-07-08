@@ -39,10 +39,18 @@ class Tester():
         startTime = time.time()
         dataRecv = client.recv(config.bufferTcp)
 
-        while dataRecv != finalData:
+        while True:
             dataRecv = client.recv(config.bufferTcp)
             numberPacketsTcp = numberPacketsTcp + 1
-        print("Fim do teste Upload TCP")
+            size = len(dataRecv)
+            if dataRecv.decode()[0] == str(1) and dataRecv.decode()[size - 1] == str(1):
+                break
+            
+            # print("dataRecv[0]: " + str(dataRecv.decode()[0]) + "\n")
+            # print("dataRecv[size - 1]: " + str(dataRecv.decode()[ size - 1]) + "\n")
+            # print("Size: " + str(size))
+        
+        print("Numero de pacotes recebidos: " + str(numberPacketsTcp))
         velUp = ((config.bufferTcp * numberPacketsTcp) /
                  8000000) / config.testTime  # Calculando velocidade de upload
 
