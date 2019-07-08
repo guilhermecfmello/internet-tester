@@ -33,7 +33,7 @@ class Tester():
         data = b'0' * config.bufferTcp
 
         # Teste de upload da internet do usuario
-        print("Iniciando teste recebimento TCP")
+        print("Iniciando teste Upload TCP")
         # sock.settimeout(5)
         numberPacketsTcp = 0
         startTime = time.time()
@@ -42,7 +42,7 @@ class Tester():
         while dataRecv != finalData:
             dataRecv = client.recv(config.bufferTcp)
             numberPacketsTcp = numberPacketsTcp + 1
-
+        print("Fim do teste Upload TCP")
         velUp = ((config.bufferTcp * numberPacketsTcp) /
                  8000000) / config.testTime  # Calculando velocidade de upload
 
@@ -56,6 +56,8 @@ class Tester():
         while time.time() - startTime < config.testTime:
             client.send(data)
             numberPacketsTcp = numberPacketsTcp + 1
+
+        time.sleep(0.1)
         client.send(finalData)
         # Calculando velocidade de download do usuario
         velDown = ((config.bufferTcp * numberPacketsTcp) /
