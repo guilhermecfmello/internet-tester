@@ -38,8 +38,6 @@ def testTcp(cli):
     startTime = time.time()
     while time.time() - startTime < config.testTime:
         sock.send(data)
-    
-    time.sleep(0.1)
     sock.send(finalData)
     
     print("Fim teste Upload")
@@ -72,7 +70,7 @@ def testUdp(cli):
 
     # buffer - 4 para ter espaço para o número do pacote
     data = b'0' * (config.bufferUdp - 4)
-    finalData = b'1' * config.bufferUdp
+    finalData = b'1' * config.bufferUdp    
 
     sock = socket(AF_INET, SOCK_DGRAM)
     sock.connect((cli.ip, cli.port))
@@ -110,8 +108,6 @@ def testUdp(cli):
             except:
                 print("Erro desconhecido")
                 break
-
-        # Tratar protocolo UDP aqui
 
         i = i + 1
         j = j + 1
@@ -152,6 +148,7 @@ def testUdp(cli):
         else:
             i = aux_i
             j = -1
+            config.lostPackagesUdpDown = config.lostPackagesUdpDown + 1
             sock.sendto(('erro').encode(), addr)
 
         if(i % 10 == 0):

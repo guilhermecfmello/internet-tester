@@ -11,7 +11,8 @@ class Tester():
         self.ip = ''
         self.port = port
         self.dirResult = './result/'  # Diretorio do arquivo de saida
-        self.nameResult = 'result.txt' # Nome do arquivo de saida que contem os resultados do teste de velocidade
+        # Nome do arquivo de saida que contem os resultados do teste de velocidade
+        self.nameResult = 'result.txt'
         self.userTcp = None
         self.userUdp = None
 
@@ -28,8 +29,8 @@ class Tester():
         print("%s:%s conectado." % client_address)
 
         finalData = b'1' * config.bufferTcp
-        data = b'0' * config.bufferTcp # Montagem do pacote de dados a ser enviado (Vetor de bytes 0)
-
+        # Montagem do pacote de dados a ser enviado (Vetor de bytes 0)
+        data = b'0' * config.bufferTcp
 
         # Teste de upload da internet do usuario
         print("Iniciando teste recebimento TCP")
@@ -37,29 +38,24 @@ class Tester():
         numberPacketsTcp = 0
         startTime = time.time()
         dataRecv = client.recv(config.bufferTcp)
-        
-        while dataRecv != finalData: 
+
+        while dataRecv != finalData:
             dataRecv = client.recv(config.bufferTcp)
             numberPacketsTcp = numberPacketsTcp + 1
-        
+
         velUp = ((config.bufferTcp * numberPacketsTcp) /
-                 8000000) / config.testTime # Calculando velocidade de upload
+                 8000000) / config.testTime  # Calculando velocidade de upload
 
         self.userTcp.setUpRate(velUp)  # Seta a velocidade de upload calculada
 
         # time.sleep(1) # Aguardando uma janela de tempo para o usuario receber os pacotes
 
-
-
-
-        
         numberPacketsTcp = 0
         print("Iniciando teste de envio TCP")
         startTime = time.time()
-        while (time.time() - startTime) < config.testTime:
+        while time.time() - startTime < config.testTime:
             client.send(data)
             numberPacketsTcp = numberPacketsTcp + 1
-        time.sleep(0.1)
         client.send(finalData)
         # Calculando velocidade de download do usuario
         velDown = ((config.bufferTcp * numberPacketsTcp) /
@@ -109,37 +105,34 @@ class Tester():
             if data == finalData:
                 s.sendto(finalData, addr)
                 break
-            b = data[0:4]
 
+            b = data[0:4]
             npackage = struct.unpack((">I").encode(), bytearray(b))[0]
 
             # Verifica se é o pacote que deve ser recebido
             if(npackage == i and len(data) == config.bufferUdp):
+                # print("Recebido pacote: "+str(npackage))
                 pass
-            # print("Recebido pacote: "+str(npackage))
-            # Verifica se é o último pacote
-            elif(len(data) != config.bufferUdp and npackage == config.numberPacketsUdp):
-                pass
-            # print("Recebido ultimo pacote: "+str(npackage))
             # Erro na transmissao do pacote
             else:
                 i = aux_i
                 j = -1
+                config.lostPackagesUdpUp = config.lostPackagesUdpUp + 1
                 s.sendto(('erro').encode(), addr)
 
             if(i % 10 == 0):
                 j = -1
                 aux_i = i
+                time.sleep(0.02)
                 s.sendto(("confirmado").encode(), addr)
                 # print(">>> Janela de 10 pacotes recebidos com sucesso!")
-            # Tratar protocolo UDP aqui
 
             i = i + 1
             j = j + 1
         print("Fim teste UDP Upload")
-        
+
         endTime = time.time()
-        totalTime = endTime - startTime 
+        totalTime = endTime - startTime
         velUp = ((config.bufferUdp * i) /
                  8000000) / totalTime  # Calculo da velocidade de upload
 
@@ -164,10 +157,10 @@ class Tester():
             s.sendto(package, addr)
             #print("Enviou pacote UDP: " + str(i) + "->" + str(package))
             if i % 10 == 0:
-                # time.sleep(0.02)
+                time.sleep(0.02)
 
                 try:
-                    
+
                     response = s.recv(config.bufferUdp).decode()
                     # print("Resultado response: " + response)
                     # print("Final data: " + finalData   )
@@ -192,7 +185,6 @@ class Tester():
             i = i + 1
             j = j + 1
 
-        
         s.sendto(finalData, addr)
         endTime = time.time()
 
@@ -202,8 +194,6 @@ class Tester():
                    8000000) / timeTotal
 
         self.userUdp.setDownRate(velDown)
-
-
 
         time.sleep(1)
 
