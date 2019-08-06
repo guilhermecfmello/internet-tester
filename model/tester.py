@@ -36,9 +36,8 @@ class Tester():
         print("Iniciando teste Upload TCP")
         # sock.settimeout(5)
         numberPacketsTcp = 0
-        startTime = time.time()
+        # startTime = time.time()
         dataRecv = client.recv(config.bufferTcp)
-
         while True:
             dataRecv = client.recv(config.bufferTcp)
             numberPacketsTcp = numberPacketsTcp + 1
@@ -50,9 +49,11 @@ class Tester():
             # print("dataRecv[size - 1]: " + str(dataRecv.decode()[ size - 1]) + "\n")
             # print("Size: " + str(size))
         
-        print("Numero de pacotes recebidos: " + str(numberPacketsTcp))
-        velUp = ((config.bufferTcp * numberPacketsTcp) /
-                 8000000) / config.testTime  # Calculando velocidade de upload
+        print("Numero de pacotes recebidos: " + str(numberPacketsTcp) + "\n")
+        print("buffer: " + str(config.bufferTcp) + "\n")
+        print("Tempo: " + str(config.testTime - 0.1) + "\n")
+        velUp = ((config.bufferTcp * 8 * numberPacketsTcp) /
+                 1048576) / (config.testTime - 0.1)  # Calculando velocidade de upload
 
         self.userTcp.setUpRate(velUp)  # Seta a velocidade de upload calculada
 
@@ -68,8 +69,11 @@ class Tester():
         time.sleep(0.1)
         client.send(finalData)
         # Calculando velocidade de download do usuario
-        velDown = ((config.bufferTcp * numberPacketsTcp) /
-                   8000000)/config.testTime
+        print("Numero de pacotes recebidos: " + str(numberPacketsTcp) + "\n")
+        print("buffer: " + str(config.bufferTcp) + "\n")
+        print("Tempo: " + str(config.testTime - 0.1) + "\n")
+        velDown = ((config.bufferTcp * 8 * numberPacketsTcp) /
+                   1048576)/(config.testTime - 0.1)
 
         self.userTcp.setDownRate(velDown)
 
@@ -83,12 +87,7 @@ class Tester():
         self.userTcp.setLat((endTime-startTime)*1000)
         print("Fim dos testes TCP")
 
-        print("Velocidade de Download do cliente: " +
-              str(self.userTcp.velDown) + " Mbits")
-        print("Velocidade de Upload do cliente: " +
-              str(self.userTcp.velUp) + " Mbits")
-        print("Latencia do Cliente: " + str(self.userTcp.lat) + " ms")
-
+ 
         print("Fechando socketTCP")
         sock.close()
 
@@ -140,12 +139,17 @@ class Tester():
             i = i + 1
             j = j + 1
         print("Fim teste UDP Upload")
-
+        
         endTime = time.time()
         totalTime = endTime - startTime
-        velUp = ((config.bufferUdp * i) /
-                 8000000) / totalTime  # Calculo da velocidade de upload
+        velUp = ((config.bufferUdp * 8 * i) /
+                 1048576) / totalTime  # Calculo da velocidade de upload
 
+
+        print("Numero de pacotes recebidos: " + str(i) + "\n")
+        print("buffer: " + str(config.bufferUdp) + "\n")
+        print("Tempo: " + str(totalTime) + "\n")
+        print("Pacotes perdidos: " + str(config.lostPackagesUdpUp))
         # Setando velocidade de upload do cliente
         self.userUdp.setUpRate(velUp)
 
@@ -200,9 +204,12 @@ class Tester():
 
         timeTotal = endTime - startTime
 
-        velDown = ((config.bufferUdp * i) /
-                   8000000) / timeTotal
-
+        velDown = ((config.bufferUdp * 8 *  i) /
+                   1048576) / timeTotal
+        print("Numero de pacotes recebidos: " + str(i) + "\n")
+        print("buffer: " + str(config.bufferUdp) + "\n")
+        print("Tempo: " + str(timeTotal) + "\n")
+        print("Pacotes perdidos: " + str(config.lostPackagesUdpDown))
         self.userUdp.setDownRate(velDown)
 
         time.sleep(1)

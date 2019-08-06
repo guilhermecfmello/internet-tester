@@ -53,6 +53,7 @@ def testTcp(cli):
     dataRecv = sock.recv(config.bufferTcp)
     while True:
         dataRecv = sock.recv(config.bufferTcp)
+        size = len(dataRecv)
         if dataRecv.decode()[0] == str(1) and dataRecv.decode()[size - 1] == str(1):
             break
     

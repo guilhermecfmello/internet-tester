@@ -1,12 +1,12 @@
 # Classe que define alguns parametros de configuracao da conexao
 
-BUFFER_TCP = 500  # pacotes de 500 bytes para tcp
+BUFFER_TCP = 2000  # pacotes de 500 bytes para tcp
 # NUM_PACKETS_TCP = 2000  # Numeros de pacotes que serao enviados no protocolo tcp
 
-BUFFERR_UDP = 1000  # pacotes de 1000 bytes para udp
+BUFFERR_UDP = 2000  # pacotes de 1000 bytes para udp
 # NUM_PACKETS_UDP = 1000  # Numeros de pacotes que serao enviados no protocolo udp
 
-TEST_TIME = 5  # Tempo de duração do teste em segundos
+TEST_TIME = 2  # Tempo de duração do teste em segundos
 
 
 class Config():
